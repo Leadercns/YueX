@@ -16,10 +16,10 @@ public interface DeveMapper {
 
 
     //更新登录IP
-    @Update("UPDATE developer SET login_ip = #{login_ip} WHERE username = #{username}")
+    @Update("UPDATE developer SET login_ip = #{loginIP} WHERE username = #{username}")
     Integer updateLoginIP(String username,String loginIP);
 
     //注册开发者
     @Insert("INSERT INTO developer (username, password, Security_answer, id) VALUES (#{username}, #{password}, #{answer}, #{userid})")
-    Integer register(String username, String password, String answer,String userid);
+    Integer register(@Param("username") String username, @Param("password") String password, @Param("answer") String answer,@Param("userid")     String userid);
 }

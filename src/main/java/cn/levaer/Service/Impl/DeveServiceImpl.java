@@ -16,8 +16,9 @@ public class DeveServiceImpl implements DeveService{
     @Autowired
     private HttpServletRequest request;
 
+    //登录
     @Override
-    public String Login(String username, String password) {
+    public String Login(String username, String password,HttpServletRequest request) {
 
         boolean checkcs = checkcs(username, password);
         if (checkcs == false) return "登录失败";
@@ -44,6 +45,7 @@ public class DeveServiceImpl implements DeveService{
     }
 
 
+    //注册
     @Override
     public String Register(String username, String password, String answer) {
         boolean checkcs = checkcs(username, password);

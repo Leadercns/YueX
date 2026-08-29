@@ -2,6 +2,7 @@ package cn.levaer.Controller;
 
 import cn.levaer.Service.DeveService;
 import cn.levaer.Tool.Result;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,9 +20,9 @@ public class DeveController {
      * @return
      */
     @PostMapping("/Login")
-    public Result Login(String username, String password) {
+    public Result Login(String username, String password,HttpServletRequest request) {
         //调用服务层
-        String msg = deveService.Login(username, password);
+        String msg = deveService.Login(username, password, request);
         if (!msg.equals("登录成功")){
             return Result.success(msg,null);
         }
