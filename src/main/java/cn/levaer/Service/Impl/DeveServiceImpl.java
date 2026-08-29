@@ -18,28 +18,39 @@ public class DeveServiceImpl implements DeveService{
 
     //登录
     @Override
-    public String Login(String username, String password,HttpServletRequest request) {
-
-        boolean checkcs = checkcs(username, password);
-        if (checkcs == false) return "登录失败";
+    public String Login(String username, String password, HttpServletRequest request, String Security_answer) {
+        // 判空（使用 trim 处理空格）
+        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+            return "用户名或密码不能为空";
+        }
         if (password.length() < 6) return "密码长度不能小于6位";
 
-        //检查开发者的账号是否存在
         Integer isDeve = deveMapper.checkDeve(username);
-        if (isDeve == 0)
-            return "账号不存在";
+        if (isDeve == 0) return "账号不存在";
 
-        //检查开发者的密码是否存在
         Integer isPassword = deveMapper.checkPassword(username, password);
-        if (isPassword == 0)
-            return "密码错误";
+        if (isPassword == 0) return "密码错误";
 
-        //更新登录IP
-        String loginIP = getClientIp(request);
-        Integer updateLoginIP = deveMapper.updateLoginIP(username, loginIP);
-        if (updateLoginIP == 0)
-            return "更新登录IP失败";
+        Integer isBan = deveMapper.checkBan(username);
+        if (isBan == 1) return "账号已封禁";
 
+        String requestIP = getClientIp(request);
+        String databaseIP = deveMapper.getIP(username);
+
+        // IP 不一致且数据库有 IP（非首次登录）才验证安全问题
+        if (databaseIP != null && !databaseIP.equals(requestIP)) {
+            if (Security_answer == null || Security_answer.trim().isEmpty()) {
+                return "安全问题不能为空";
+            }
+            Integer answerCheck = deveMapper.checkSecurity_answer(username, Security_answer);
+            if (answerCheck == 0) {
+                return "安全问题答案错误或不存在";
+            }
+        }
+
+        // 更新 IP（使用 requestIP）
+        Integer update = deveMapper.updateLoginIP(username, requestIP);
+        if (update == 0) return "更新登录IP失败";
 
         return "登录成功";
     }

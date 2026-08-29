@@ -5,21 +5,26 @@ import org.apache.ibatis.annotations.*;
 @Mapper
 public interface DeveMapper {
 
-    //检查开发者是否存在
     @Select("SELECT COUNT(*) FROM developer WHERE username = #{username}")
     Integer checkDeve(String username);
 
-
-    //检查开发者密码是否错误 1正确 0错误
     @Select("SELECT COUNT(*) FROM developer WHERE username = #{username} AND password = #{password}")
-    Integer checkPassword(String username, String password);
+    Integer checkPassword(@Param("username") String username, @Param("password") String password);
 
-
-    //更新登录IP
     @Update("UPDATE developer SET login_ip = #{loginIP} WHERE username = #{username}")
-    Integer updateLoginIP(String username,String loginIP);
+    Integer updateLoginIP(@Param("username") String username, @Param("loginIP") String loginIP);
 
-    //注册开发者
     @Insert("INSERT INTO developer (username, password, Security_answer, id) VALUES (#{username}, #{password}, #{answer}, #{userid})")
-    Integer register(@Param("username") String username, @Param("password") String password, @Param("answer") String answer,@Param("userid")     String userid);
+    Integer register(@Param("username") String username, @Param("password") String password,
+                     @Param("answer") String answer, @Param("userid") String userid);
+
+    @Select("SELECT State FROM developer WHERE username = #{username}")
+    Integer checkBan(String username);
+
+    // 修正：返回 COUNT 更安全
+    @Select("SELECT COUNT(*) FROM developer WHERE username = #{username} AND Security_answer = #{securityAnswer}")
+    Integer checkSecurity_answer(@Param("username") String username, @Param("securityAnswer") String securityAnswer);
+
+    @Select("SELECT login_ip FROM developer WHERE username = #{username}")
+    String getIP(String username);
 }

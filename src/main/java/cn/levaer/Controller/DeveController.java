@@ -5,6 +5,7 @@ import cn.levaer.Tool.Result;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -20,11 +21,12 @@ public class DeveController {
      * @return
      */
     @PostMapping("/Login")
-    public Result Login(String username, String password,HttpServletRequest request) {
+    public Result Login(String username, String password,HttpServletRequest request,
+                        @RequestParam(required = false) String Security_answer) {
         //调用服务层
-        String msg = deveService.Login(username, password, request);
+        String msg = deveService.Login(username, password, request,Security_answer);
         if (!msg.equals("登录成功")){
-            return Result.success(msg,null);
+            return Result.error(msg);
         }
 
         return Result.success("登录成功",null);
@@ -32,6 +34,13 @@ public class DeveController {
 
 
 
+    /**
+     * 注册
+     * @param username
+     * @param password
+     * @param answer
+     * @return
+     */
     @PostMapping("/Register")
     public Result Register(String username, String password,String answer) {
         //调用服务层
@@ -41,5 +50,6 @@ public class DeveController {
         }
         return Result.success(msg,null);
     }
+
 
 }
