@@ -1,98 +1,214 @@
-# ⚠️ 项目免责声明
+# YueX - 轻量级多级权限 API 管理平台
+
+> **单租户 · 三层角色 · 邀请注册 · IP 安全验证**
+
+
+## 📖 项目介绍
+
+### 这个东西是什么？
+
+**YueX** 是一个基于 **Spring Boot 4.1.1 + JDK 21** 构建的**轻量级多级权限 API 管理平台**，采用 **三层角色体系**：
+
+```
+👑 管理员（Admin）
+    │  管理开发者账号、生成邀请码、审核注册
+    ▼
+🧑‍💻 开发者（Developer）
+    │  拥有自己的 API 空间，管理下属用户
+    ▼
+👤 终端用户（User）
+    │  通过 API Key 调用开发者提供的接口
+```
+
+**简单说：管理员管开发者，开发者管自己的用户。**
+
+### 它能干什么？
+
+| 角色 | 已实现功能 |
+|------|-----------|
+| **👑 管理员** | 登录、注册（需邀请码）、Token 自动续期（24h）、账号封禁检测 |
+| **🧑‍💻 开发者** | 登录（含 IP 变化安全问题验证）、注册（独立）、账号封禁检测 |
+| **👤 用户** | 🚧 开发中 |
+
+### 核心功能
+
+- ✅ **邀请码注册制**（防止恶意注册）
+- ✅ **三层角色隔离**（管理员 → 开发者 → 用户）
+- ✅ **Token 认证**（登录后 24 小时有效，自动续期）
+- ✅ **开发者 IP 安全验证**（陌生 IP 登录需回答安全问题）
+- ✅ **账号状态管理**（封禁/启用）
+- ✅ **独立 ID 生成**（管理员ID、开发者ID、用户ID）
+
+### 适用场景
+
+- 🚀 小型 SaaS 平台的用户管理模块
+- 🔐 需要"开发者-用户"分层的 API 服务平台
+- 🎓 学习 Spring Boot 多角色权限控制
+- 🧩 快速搭建内部 API 管理后台
+
+### 技术栈
+
+| 技术 | 版本 |
+|------|------|
+| Java | 21 |
+| Spring Boot | 4.1.1 |
+| MyBatis | 4.0.1 |
+| MySQL | 8.0+ |
+| Maven | 3.9+ |
+| Lombok | 最新 |
+
+### 项目定位
+
+- **架构模式**：单租户（Singleton Tenant）
+- **角色体系**：三层（管理员 → 开发者 → 用户）
+- **部署形态**：单体应用（Monolithic）
+
+
+## 🚀 项目部署
+
+### 环境要求
+
+- JDK 21+
+- MySQL 8.0+
+- Maven 3.9+
+- Git
+
+### 第一步：克隆项目
+
+```bash
+git clone https://github.com/Leadercns/YueX.git
+cd YueX
+```
+
+### 第二步：创建数据库
+
+```sql
+CREATE DATABASE yuex DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+### 第三步：修改配置文件
+
+打开 `src/main/resources/application.yml`：
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/yuex?useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: 你的数据库密码
+    driver-class-name: com.mysql.cj.jdbc.Driver
+```
+
+### 第四步：建表
+
+```SQL文件我会放在项目SQL文件夹里面的，直接导入就行。
+```
+
+### 第五步：插入初始管理员
+
+```sql
+INSERT INTO admins (username, password, State, ICode, ICodeS) 
+VALUES ('admin', '123456', 0, 'INITCODE', 0);
+```
+
+### 第六步：打包启动
+
+```bash
+mvn clean package -DskipTests
+java -jar target/YueX-*.jar
+```
+
+### 第七步：测试接口
+
+#### 管理员接口（`/admin`）
+
+| 功能 | 方法 | 接口 | 参数 | 说明 |
+|------|------|------|------|------|
+| 登录 | POST | `/admin/Login` | `username`, `password` | 返回 token |
+| 注册 | POST | `/admin/Register` | `username`, `password`, `code` | 需要邀请码 |
+
+#### 开发者接口（`/`）
+
+| 功能 | 方法 | 接口 | 参数 | 说明 |
+|------|------|------|------|------|
+| 登录 | POST | `/Login` | `username`, `password`, `Security_answer`（可选）| IP变化时需安全问题 |
+| 注册 | POST | `/Register` | `username`, `password`, `answer` | 独立注册 |
+
+#### 用户接口（`/api`）🚧 开发中
+
+### 接口示例
+
+```bash
+# 管理员登录
+curl -X POST http://localhost:8080/admin/Login \
+  -d "username=admin&password=123456"
+
+# 管理员注册（需要邀请码）
+curl -X POST http://localhost:8080/admin/Register \
+  -d "username=test&password=123456&code=INITCODE"
+
+# 开发者注册
+curl -X POST http://localhost:8080/Register \
+  -d "username=dev01&password=123456&answer=我的宠物名字"
+
+# 开发者登录
+curl -X POST http://localhost:8080/Login \
+  -d "username=dev01&password=123456"
+```
+
+
+## 📂 项目结构
+
+```
+src/main/java/cn/levaer/
+├── Controller/
+│   ├── AdminController.java      # 管理员接口
+│   ├── DeveController.java       # 开发者接口
+│   └── UserController.java       # 用户接口（开发中）
+├── Service/
+│   ├── AdminService.java         # 管理员服务接口
+│   ├── DeveService.java          # 开发者服务接口
+│   ├── UserService.java          # 用户服务接口（开发中）
+│   └── Impl/
+│       ├── AdminServiceImpl.java # 管理员服务实现
+│       ├── DeveServiceImpl.java  # 开发者服务实现
+│       └── UserServiceImpl.java  # 用户服务实现（开发中）
+├── Mapper/
+│   ├── AdminMapper.java          # 管理员数据访问
+│   ├── DeveMapper.java           # 开发者数据访问
+│   └── UserMapper.java           # 用户数据访问（开发中）
+└── Tool/
+    └── Result.java               # 统一响应结果
+```
+
+
+## 📄 免责声明
 
 > **本开源项目仅供学习、研究及技术交流使用。**
 
-## 🛠 项目配置
+### ⚠️ 安全警告
 
-| 项目 | 版本 |
-|------|------|
-| **JDK** | 21 |
-| **Java** | 21 |
+1. **生产环境禁止直接使用** — 本项目未经安全加固，直接部署存在严重安全隐患。
 
----
+2. **密码必须加密** — 当前为明文存储，正式使用请集成 BCrypt 等加密方案。
 
-## 🔒 安全警告
+3. **必须自行实现 JWT 鉴权** — 当前 Token 为简易随机串，生产环境请替换为 JWT。
 
-**请务必阅读并遵守以下条款：**
+4. **使用者自行承担风险** — 因使用本项目导致的任何后果，与原作者无关。
 
-1. **生产环境禁止直接使用**  
-   本项目代码仅为演示和教学目的编写，**未经任何安全加固**，直接部署到公网或生产环境存在严重安全隐患。
-
-2. **密码必须加密**  
-   若您计划将本项目用于任何实际场景，**必须**对用户密码进行加密存储（如使用 BCrypt、Argon2 等安全哈希算法），本项目当前采用明文存储，**极不安全**。
-
-3. **必须自行实现 JWT 鉴权**  
-   本项目使用的 Token 仅为简易随机字符串，**不具备生产级安全性**。正式使用时，请务必集成 JWT（JSON Web Token）或 OAuth2 等成熟鉴权方案。
-
-4. **自行承担风险**  
-   因使用本项目（包括但不限于二次开发、部署、传播）导致的任何数据泄露、系统入侵、法律纠纷等后果，**均由使用者自行承担，与原作者无关**。
-
----
-
-## 🔧 二次开发说明
+### 📝 二开说明
 
 - ✅ 欢迎 Fork、Clone、修改、再分发
-- ✅ 鼓励学习其中的代码逻辑和设计思路
-- ❌ 请勿将本项目代码直接用于商业项目
+- ❌ 请勿将本项目代码直接用于商业项目（未经安全加固）
 - ❌ 请勿移除或篡改本免责声明
 
----
+### 📄 许可证
 
-## 📄 许可证
+本项目采用 [MIT License](LICENSE)，原作者不提供任何形式的担保或责任。
 
-本项目采用 [MIT License](LICENSE)，您几乎可以对本项目做任何操作，但原作者不提供任何形式的担保或责任。
-
----
 
 **最后强调：代码随便改，出事自己扛。🙏**
 
-
-
-
-# ⚠️ Project Disclaimer
-
-> **This open-source project is intended for learning, research, and technical exchange purposes only.**
-
-## 🛠 Project Configuration
-
-| Item | Version |
-|------|---------|
-| **JDK** | 21 |
-| **Java** | 21 |
-
 ---
 
-## 🔒 Security Warning
-
-**Please read and comply with the following terms:**
-
-1. **DO NOT use this project directly in production.**  
-   This code is written for demonstration and educational purposes only. It has **not undergone any security hardening**. Deploying it to a public network or production environment poses serious security risks.
-
-2. **Passwords MUST be encrypted.**  
-   If you plan to use this project in any real-world scenario, you **must** implement secure password hashing (e.g., BCrypt, Argon2, or similar). This project currently stores passwords in plain text – **this is highly insecure**.
-
-3. **You MUST implement proper JWT authentication.**  
-   The token mechanism used in this project is a simple random string and **is not production‑grade**. For official use, please integrate JWT (JSON Web Token) or OAuth2, along with appropriate security measures.
-
-4. **You bear all risks.**  
-   Any consequences arising from the use of this project – including but not limited to data breaches, system intrusions, or legal disputes – are **solely your responsibility**. The original author assumes no liability.
-
----
-
-## 🔧 Modification & Redistribution
-
-- ✅ You are welcome to fork, clone, modify, and redistribute.
-- ✅ Learning from the code structure and logic is encouraged.
-- ❌ Do not use this code directly in commercial projects without proper security hardening.
-- ❌ Do not remove or alter this disclaimer.
-
----
-
-## 📄 License
-
-This project is licensed under the [MIT License](LICENSE). You are free to do almost anything with it, but the author provides no warranty or liability of any kind.
-
----
-
-**Final reminder: Feel free to modify the code, but you are solely responsible for your own modifications and usage. 🙏**
+**如果这个项目对你有帮助，欢迎点个 Star ⭐ 支持一下！**
