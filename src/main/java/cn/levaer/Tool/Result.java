@@ -6,12 +6,12 @@ import lombok.Data;
 public class Result {
 
     private int code;
-    private String message;
+    private String msg;
     private Object data;
 
     public Result(int code, String message, Object data) {
         this.code = code;
-        this.message = message;
+        this.msg = message;
         this.data = data;
     }
 

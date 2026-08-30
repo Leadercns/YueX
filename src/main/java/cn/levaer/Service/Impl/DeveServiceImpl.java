@@ -13,8 +13,7 @@ public class DeveServiceImpl implements DeveService{
 
     @Autowired
     private DeveMapper deveMapper;
-    @Autowired
-    private HttpServletRequest request;
+
 
     //登录
     @Override
@@ -26,13 +25,13 @@ public class DeveServiceImpl implements DeveService{
         if (password.length() < 6) return "密码长度不能小于6位";
 
         Integer isDeve = deveMapper.checkDeve(username);
-        if (isDeve == 0) return "账号不存在";
+        if (isDeve == 0) return "开发者账号不存在";
 
         Integer isPassword = deveMapper.checkPassword(username, password);
         if (isPassword == 0) return "密码错误";
 
         Integer isBan = deveMapper.checkBan(username);
-        if (isBan == 1) return "账号已封禁";
+        if (isBan == 1) return "开发者账号已封禁";
 
         String requestIP = getClientIp(request);
         String databaseIP = deveMapper.getIP(username);
