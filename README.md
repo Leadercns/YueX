@@ -45,3 +45,54 @@
 ---
 
 **最后强调：代码随便改，出事自己扛。🙏**
+
+
+
+
+# ⚠️ Project Disclaimer
+
+> **This open-source project is intended for learning, research, and technical exchange purposes only.**
+
+## 🛠 Project Configuration
+
+| Item | Version |
+|------|---------|
+| **JDK** | 21 |
+| **Java** | 21 |
+
+---
+
+## 🔒 Security Warning
+
+**Please read and comply with the following terms:**
+
+1. **DO NOT use this project directly in production.**  
+   This code is written for demonstration and educational purposes only. It has **not undergone any security hardening**. Deploying it to a public network or production environment poses serious security risks.
+
+2. **Passwords MUST be encrypted.**  
+   If you plan to use this project in any real-world scenario, you **must** implement secure password hashing (e.g., BCrypt, Argon2, or similar). This project currently stores passwords in plain text – **this is highly insecure**.
+
+3. **You MUST implement proper JWT authentication.**  
+   The token mechanism used in this project is a simple random string and **is not production‑grade**. For official use, please integrate JWT (JSON Web Token) or OAuth2, along with appropriate security measures.
+
+4. **You bear all risks.**  
+   Any consequences arising from the use of this project – including but not limited to data breaches, system intrusions, or legal disputes – are **solely your responsibility**. The original author assumes no liability.
+
+---
+
+## 🔧 Modification & Redistribution
+
+- ✅ You are welcome to fork, clone, modify, and redistribute.
+- ✅ Learning from the code structure and logic is encouraged.
+- ❌ Do not use this code directly in commercial projects without proper security hardening.
+- ❌ Do not remove or alter this disclaimer.
+
+---
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE). You are free to do almost anything with it, but the author provides no warranty or liability of any kind.
+
+---
+
+**Final reminder: Feel free to modify the code, but you are solely responsible for your own modifications and usage. 🙏**
