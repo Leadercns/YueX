@@ -6,4 +6,8 @@ public interface AdminService {
     String token(String username);
 
     String register(String username, String password,String code);
+
+    String banuser(String token, String username);
+
+    String unseal(String token, String username);
 }

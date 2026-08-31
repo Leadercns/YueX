@@ -53,11 +53,37 @@ public class AdminController {
         return Result.success(msg, null);
     }
 
+    /**
+     * 管理员封禁开发者账号
+     * @param token
+     * @param username
+     * @return
+     */
+    @PostMapping("/BanUser")
+    public Result banuser(String token,String username){
 
+        String msg = adminService.banuser(token,username);
+        if (!msg.equals("封号成功")){
+            return Result.error(msg);
+        }
+        return Result.success(msg, null);
+    }
 
+    /**
+     * 管理员解封开发者账号
+     * @param token
+     * @param username
+     * @return
+     */
+    @PostMapping("/Unseal")
+    public Result unseal(String token,String username){
 
-
-
+        String msg = adminService.unseal(token,username);
+        if (!msg.equals("解封成功")){
+            return Result.error(msg);
+        }
+        return Result.success(msg, null);
+    }
 
 
 }

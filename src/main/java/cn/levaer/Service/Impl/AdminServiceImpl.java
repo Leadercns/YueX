@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 @Service
 @Slf4j
@@ -129,7 +131,84 @@ public class AdminServiceImpl implements AdminService {
     }
 
 
+    //管理员封禁开发者账号
+    @Override
+    public String banuser(String token, String username) {
+        //检查参数问题
+        if (token.isEmpty() || username.isEmpty())
+            return "参数不能为空";
 
+        //检查token是否存在
+        Integer isTokenExistence = adminMapper.isTokenExistence(token);
+        if (isTokenExistence == 0) return "token不存在";
+
+        //检查上传的开发者账号是否存在
+        Integer isExistence = adminMapper.isuserExistence(username);
+        if (isExistence == 0) return "开发者账号不存在";
+
+        //检查上传的开发者账号是否被封禁
+        Integer isDisabled = adminMapper.isdeveDisabled(username);
+        if (isDisabled == 1) return "开发者账号已封禁";
+
+        //检查token是否有效，24h判断
+        //获取token时间
+        String tokenTimeStr = adminMapper.gettokentimeByToken(token);
+        log.info("token时间文本数据库: " + tokenTimeStr);
+
+        //获取当前时间戳,并把tokentime转成时间戳
+        long currentTime = System.currentTimeMillis();
+        log.info("当前时间戳: " + currentTime);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(tokenTimeStr, formatter);
+        long tokenTime = dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        log.info("转换后的时间戳: " + tokenTime);
+
+        if (currentTime - tokenTime > 24 * 60 * 60 * 1000) return "token已过期";
+
+        //封禁开发者账号
+        Integer isBanned = adminMapper.banuser(username);
+        if (isBanned == 0) return "封禁失败";
+        return "封禁成功";
+
+    }
+
+
+    //管理员解封开发者账号
+    @Override
+    public String unseal(String token, String username) {
+        //检查参数问题
+        if (token.isEmpty() || username.isEmpty())
+            return "参数不能为空";
+
+        //检查token是否存在
+        Integer isTokenExistence = adminMapper.isTokenExistence(token);
+        if (isTokenExistence == 0) return "token不存在";
+
+        //检查上传的开发者账号是否存在
+        Integer isExistence = adminMapper.isuserExistence(username);
+        if (isExistence == 0) return "开发者账号不存在";
+
+        //检查上传的开发者账号是否被封禁
+        Integer isDisabled = adminMapper.isdeveDisabled(username);
+        if (isDisabled == 0) return "开发者账号状态正常";
+
+        ///检查token是否有效，24h判断
+        //获取token时间
+        String tokenTimeStr = adminMapper.gettokentimeByToken(token);
+        //获取当前时间戳,并把tokentime转成时间戳
+        long currentTime = System.currentTimeMillis();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime dateTime = LocalDateTime.parse(tokenTimeStr, formatter);
+        long tokenTime = dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+        if (currentTime - tokenTime > 24 * 60 * 60 * 1000) return "token已过期";
+        //解封开发者账号
+        Integer isUnsealed = adminMapper.unseal(username);
+        if (isUnsealed == 0) return "解封失败";
+        return "解封成功";
+
+    }
 
     private Integer isE(String username, String password){
 
@@ -178,10 +257,4 @@ public class AdminServiceImpl implements AdminService {
         // 返回当前时间 年月日 hh:mm:ss
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
     }
-
-
-
-
-
-
 }

@@ -70,4 +70,29 @@ public interface AdminMapper {
 
     @Update("update admins set token = #{token}, tokentime = #{time} where username = #{username}")
     void updateToken(String username, String token, String time);
+
+    //检查token是否存在
+    @Select("select count(*) from admins where token = #{token}")
+    Integer isTokenExistence(String token);
+
+    //封禁开发者账号
+    @Update("update developer set State = 1 where username = #{username}")
+    Integer banuser(String username);
+
+    //解封开发者账号
+    @Update("update developer set State = 0 where username = #{username}")
+    Integer unseal(String username);
+
+
+    //依靠token获取tokentime
+    @Select("select tokentime from admins where token = #{token}")
+    String gettokentimeByToken(String token);
+
+    //检查开发者是否存在
+    @Select("select count(*) from developer where username = #{username}")
+    Integer isuserExistence(String username);
+
+    //检查开发者是否被封禁
+    @Select("select State from developer where username = #{username}")
+    Integer isdeveDisabled(String username);
 }
