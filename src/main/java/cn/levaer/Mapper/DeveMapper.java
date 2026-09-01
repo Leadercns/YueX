@@ -31,4 +31,8 @@ public interface DeveMapper {
     //重置id
     @Update("UPDATE developer SET id = #{userid} WHERE username = #{username}")
     Integer reset(String username, String password, String userid);
+
+    //根据用户名获取用户id
+    @Select("SELECT id FROM developer WHERE username = #{username}")
+    String getdeveid(String username);
 }

@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.PortUnreachableException;
+import java.util.Map;
+
 @RestController
 public class DeveController {
 
@@ -69,5 +72,23 @@ public class DeveController {
         String s = "！请重新对接";
         return Result.success(msg + s,null);
     }
+
+    /**
+     * 获取开发者ID
+     * @param username
+     * @param password
+     * @return
+     */
+    @PostMapping("/getdeveid")
+    public Result getdeveid(String username,String password){
+        String msg = deveService.getdeveid(username,password);
+        if (!msg.contains("获取成功")){
+            return Result.error(msg);
+        }
+        return Result.success(msg,null);
+    }
+
+
+
 
 }

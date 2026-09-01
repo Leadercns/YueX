@@ -8,4 +8,6 @@ public interface DeveService {
     String Register(String username, String password, String answer);
 
     String Reset(String username, String password);
+
+    String getdeveid(String username, String password);
 }

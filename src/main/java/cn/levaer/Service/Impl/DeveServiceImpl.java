@@ -108,6 +108,25 @@ public class DeveServiceImpl implements DeveService{
         return "重置成功";
     }
 
+
+    //获取开发者ID
+    @Override
+    public String getdeveid(String username, String password) {
+        Integer isDeve = deveMapper.checkDeve(username);
+        if (isDeve == 0)
+            return "开发者账号不存在";
+        Integer isPassword = deveMapper.checkPassword(username, password);
+        if (isPassword == 0)
+            return "密码错误";
+        Integer isBan = deveMapper.checkBan(username);
+        if (isBan == 1) return "开发者账号已封禁";
+
+        String userid = deveMapper.getdeveid(username);
+        if (userid == null) return "获取失败";
+
+        return "获取成功" + userid;
+    }
+
     private boolean checkcs(String username, String password) {
 
         if (username.isEmpty() || password.isEmpty()){
