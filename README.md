@@ -120,23 +120,26 @@ java -jar target/YueX-*.jar
 ```
 
 ### 第七步：测试接口
-管理员接口（/admin）
-功能	方法	接口	参数	说明
-登录	POST	/admin/Login	username, password	返回 token
-注册	POST	/admin/Register	username, password, code	需要邀请码
+### 管理员接口（/admin）
+| 功能 | 方法 | 接口 | 参数 | 说明 |
+|------|------|------|------|------|
+| 登录 | POST | `/admin/Login` | `username`, `password` | 返回 token |
+| 注册 | POST | `/admin/Register` | `username`, `password`, `code` | 需要邀请码 |
 ### 开发者接口（/）
-功能	方法	接口	参数	说明
-登录	POST	/Login	username, password, Security_answer（可选）	IP变化时需安全问题
-注册	POST	/Register	username, password, answer	独立注册
+| 功能 | 方法 | 接口 | 参数 | 说明 |
+|------|------|------|------|------|
+| 登录 | POST | `/Login` | `username`, `password`, `Security_answer`（可选） | IP变化时需回答问题 |
+| 注册 | POST | `/Register` | `username`, `password`, `answer` | 独立注册，无需邀请码 |
 ### 用户接口（/api）
-功能	方法	接口	参数	说明
-用户登录	POST	/api/Login	username, password	返回用户 token
-用户注册	POST	/api/Register	username, password, dev_id	需提供开发者ID
-获取用户列表	GET	/api/Users	无（需登录）	当前开发者下的所有用户
-获取指定用户	GET	/api/User/{userid}	路径参数	查看某个用户详情
-封禁/解封用户	PUT	/api/User/State	userid, state	修改用户状态
-用户签到	POST	/api/User/Sign	无（需登录）	签到记录/积分
-重置开发者ID	PUT	/api/Developer/ResetId	无（需登录）	重新生成开发者自己的ID
+| 功能 | 方法 | 接口 | 参数 | 说明 |
+|------|------|------|------|------|
+| 用户登录 | POST | `/api/Login` | `username`, `password` | 返回用户 token |
+| 用户注册 | POST | `/api/Register` | `username`, `password`, `dev_id` | 需提供开发者ID |
+| 获取用户列表 | GET | `/api/Users` | 无（需登录） | 当前开发者下的所有用户 |
+| 获取指定用户 | GET | `/api/User/{userid}` | 路径参数 | 查看某个用户详情 |
+| 封禁/解封用户 | PUT | `/api/User/State` | `userid`, `state` | 修改用户状态 |
+| 用户签到 | POST | `/api/User/Sign` | 无（需登录） | 签到记录/积分 |
+| 重置开发者ID | PUT | `/api/Developer/ResetId` | 无（需登录） | 重新生成开发者自己的ID |
 
 
 ### 接口示例
