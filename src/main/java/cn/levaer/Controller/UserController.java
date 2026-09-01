@@ -121,6 +121,7 @@ public class UserController {
      * @param username 用户名
      * @return
      */
+    @GetMapping("/checkIn")
     public Result checkIn(String id, String username) {
         // 调用服务层方法用户签到
         String msg = userService.checkIn(id,username);
