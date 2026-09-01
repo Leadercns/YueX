@@ -27,4 +27,8 @@ public interface DeveMapper {
 
     @Select("SELECT login_ip FROM developer WHERE username = #{username}")
     String getIP(String username);
+
+    //重置id
+    @Update("UPDATE developer SET id = #{userid} WHERE username = #{username}")
+    Integer reset(String username, String password, String userid);
 }

@@ -78,6 +78,36 @@ public class DeveServiceImpl implements DeveService{
         return "注册成功";
     }
 
+
+    //重置ID
+    @Override
+    public String Reset(String username, String password) {
+        //检查参数
+        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+            return "用户名或密码不能为空";
+        }
+        if (password.length() < 6) return "密码长度不能小于6位";
+
+        //检查开发者账号是否存在
+        Integer isDeve = deveMapper.checkDeve(username);
+        if (isDeve == 0)
+            return "账号不存在";
+        //检查密码是否正确
+        Integer isPassword = deveMapper.checkPassword(username, password);
+        if (isPassword == 0)
+            return "密码错误";
+        //检查开发者状态
+        Integer isBan = deveMapper.checkBan(username);
+        if (isBan == 1) return "开发者账号已封禁";
+
+        //生成用户ID长度18位
+        String userid = generateUserId();
+        Integer reset = deveMapper.reset(username, password, userid);
+        if (reset == 0)
+            return "重置失败";
+        return "重置成功";
+    }
+
     private boolean checkcs(String username, String password) {
 
         if (username.isEmpty() || password.isEmpty()){

@@ -52,4 +52,22 @@ public class DeveController {
     }
 
 
+    /**
+     * 重置ID
+     * @param username
+     * @param password
+     * @return
+     */
+    @PostMapping("/Reset")
+    public Result Reset(String username, String password) {
+
+        //调用服务层
+        String msg = deveService.Reset(username, password);
+        if (!msg.equals("重置成功")){
+            return Result.error(msg);
+        }
+        String s = "！请重新对接";
+        return Result.success(msg + s,null);
+    }
+
 }

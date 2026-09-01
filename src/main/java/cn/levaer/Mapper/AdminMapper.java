@@ -54,20 +54,23 @@ public interface AdminMapper {
     void usecodes(String code);
 
 
+    //检查邀请码是否来自管理员
     @Select("select count(*) from admins where ICode = #{code} and username ='admin' ")
     Integer isCodeFromAdmin(String code);
 
+    //封禁管理员账号
     @Update("update admins set State = 1 where username = 'admin'")
     void disableAdmin();
 
+    //依靠用户名获取token
     @Select("select token from admins where username = #{username}")
     String gettoken(String username);
 
-
+    //依靠用户名获取tokentime
     @Select("select tokentime from admins where username = #{username}")
     String gettokentime(String username);
 
-
+    //更新token
     @Update("update admins set token = #{token}, tokentime = #{time} where username = #{username}")
     void updateToken(String username, String token, String time);
 
@@ -95,4 +98,6 @@ public interface AdminMapper {
     //检查开发者是否被封禁
     @Select("select State from developer where username = #{username}")
     Integer isdeveDisabled(String username);
+
+
 }
