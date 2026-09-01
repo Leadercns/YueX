@@ -28,7 +28,7 @@
 |------|-----------|
 | **👑 管理员** | 登录、注册（需邀请码）、Token 自动续期（24h）、账号封禁检测 |
 | **🧑‍💻 开发者** | 登录（含 IP 变化安全问题验证）、注册（独立）、账号封禁检测 |
-| **👤 用户** | 🚧 开发中 |
+| **👤 用户** | 登录/注册、获取用户列表、获取指定用户信息、封禁/解封、签到 |
 
 ### 核心功能
 
@@ -38,6 +38,8 @@
 - ✅ **开发者 IP 安全验证**（陌生 IP 登录需回答安全问题）
 - ✅ **账号状态管理**（封禁/启用）
 - ✅ **独立 ID 生成**（管理员ID、开发者ID、用户ID）
+- ✅ **用户完整 CRUD + 签到**（开发者管理自己的用户）
+- ✅ **重置开发者 ID**（开发者可重新生成身份标识）
 
 ### 适用场景
 
@@ -118,22 +120,24 @@ java -jar target/YueX-*.jar
 ```
 
 ### 第七步：测试接口
+管理员接口（/admin）
+功能	方法	接口	参数	说明
+登录	POST	/admin/Login	username, password	返回 token
+注册	POST	/admin/Register	username, password, code	需要邀请码
+### 开发者接口（/）
+功能	方法	接口	参数	说明
+登录	POST	/Login	username, password, Security_answer（可选）	IP变化时需安全问题
+注册	POST	/Register	username, password, answer	独立注册
+### 用户接口（/api）
+功能	方法	接口	参数	说明
+用户登录	POST	/api/Login	username, password	返回用户 token
+用户注册	POST	/api/Register	username, password, dev_id	需提供开发者ID
+获取用户列表	GET	/api/Users	无（需登录）	当前开发者下的所有用户
+获取指定用户	GET	/api/User/{userid}	路径参数	查看某个用户详情
+封禁/解封用户	PUT	/api/User/State	userid, state	修改用户状态
+用户签到	POST	/api/User/Sign	无（需登录）	签到记录/积分
+重置开发者ID	PUT	/api/Developer/ResetId	无（需登录）	重新生成开发者自己的ID
 
-#### 管理员接口（`/admin`）
-
-| 功能 | 方法 | 接口 | 参数 | 说明 |
-|------|------|------|------|------|
-| 登录 | POST | `/admin/Login` | `username`, `password` | 返回 token |
-| 注册 | POST | `/admin/Register` | `username`, `password`, `code` | 需要邀请码 |
-
-#### 开发者接口（`/`）
-
-| 功能 | 方法 | 接口 | 参数 | 说明 |
-|------|------|------|------|------|
-| 登录 | POST | `/Login` | `username`, `password`, `Security_answer`（可选）| IP变化时需安全问题 |
-| 注册 | POST | `/Register` | `username`, `password`, `answer` | 独立注册 |
-
-#### 用户接口（`/api`）🚧 开发中
 
 ### 接口示例
 
@@ -153,6 +157,14 @@ curl -X POST http://localhost:8080/Register \
 # 开发者登录
 curl -X POST http://localhost:8080/Login \
   -d "username=dev01&password=123456"
+
+# 用户登录
+curl -X POST http://localhost:8080/api/Login \
+  -d "username=user1&password=123456"
+
+# 获取用户列表（需携带用户token）
+curl -X GET http://localhost:8080/api/Users \
+  -H "token: 你的用户token"
 ```
 
 
@@ -163,19 +175,19 @@ src/main/java/cn/levaer/
 ├── Controller/
 │   ├── AdminController.java      # 管理员接口
 │   ├── DeveController.java       # 开发者接口
-│   └── UserController.java       # 用户接口（开发中）
+│   └── UserController.java       # 用户接口
 ├── Service/
 │   ├── AdminService.java         # 管理员服务接口
 │   ├── DeveService.java          # 开发者服务接口
-│   ├── UserService.java          # 用户服务接口（开发中）
+│   ├── UserService.java          # 用户服务接口
 │   └── Impl/
 │       ├── AdminServiceImpl.java # 管理员服务实现
 │       ├── DeveServiceImpl.java  # 开发者服务实现
-│       └── UserServiceImpl.java  # 用户服务实现（开发中）
+│       └── UserServiceImpl.java  # 用户服务实现
 ├── Mapper/
 │   ├── AdminMapper.java          # 管理员数据访问
 │   ├── DeveMapper.java           # 开发者数据访问
-│   └── UserMapper.java           # 用户数据访问（开发中）
+│   └── UserMapper.java           # 用户数据访问
 └── Tool/
     └── Result.java               # 统一响应结果
 ```
