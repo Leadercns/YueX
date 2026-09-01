@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -235,27 +236,40 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        //检查用户是否已签到24h制
-        //获取用户签到时间
+        // 检查签到时间（24小时限制）
         String checkTime = userMapper.getCheckTime(id, username);
-        //获取当前时间戳
-        long currentTime = System.currentTimeMillis();
-        //把checkTime转成时间戳
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        //转成时间戳
-        LocalDateTime dateTime = LocalDateTime.parse(checkTime, formatter);
-        long checkTimeMillis = dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
-        if (currentTime - checkTimeMillis < 24 * 60 * 60 * 1000){
-            return "请勿重复签到";
+        if (checkTime != null && !checkTime.trim().isEmpty()) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                LocalDateTime lastCheck = LocalDateTime.parse(checkTime, formatter);
+                long lastMillis = lastCheck.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+                long now = System.currentTimeMillis();
+                if (now - lastMillis < 24 * 60 * 60 * 1000) {
+                    return "请勿重复签到（24小时内已签到）";
+                }
+            } catch (DateTimeParseException e) {
+                // 时间格式异常，记录日志，允许签到（可容忍错误）
+                log.warn("签到时间格式异常: {}", checkTime);
+            }
         }
-        //获取当前时间
-        String currentTimeStr = LocalDateTime.now().format(formatter);
-        //获取用户积分
-        int userPoints = userMapper.getUserPoints(id, username);
-        userPoints += 10;//签到加10积分
-        //用户签到
-        Integer checkInResult = userMapper.checkIn(id, username,currentTimeStr,userPoints);
-        if (checkInResult == 0) return "签到失败";
+
+        // 获取当前积分
+        Integer points = userMapper.getUserPoints(id, username);
+        if (points == null) {
+            points = 0;
+        }
+
+        int newPoints = points + 10;
+
+        // 执行签到更新
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String nowStr = LocalDateTime.now().format(formatter);
+        int affected = userMapper.checkIn(id, username, nowStr, newPoints);
+        if (affected <= 0) {
+            return "签到失败，数据库更新异常";
+        }
+
+
         return "签到成功";
 
     }
